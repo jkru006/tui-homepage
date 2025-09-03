@@ -1,0 +1,32 @@
+{
+  "Monday": [
+    {"time": "8:00 am - 9:30 am", "subject": "Biology"},
+    {"time": "9:45 am - 11:15 am", "subject": "Mathematics"},
+    {"time": "11:30 am - 1:00 pm", "subject": "History"},
+    {"time": "2:00 pm - 3:30 pm", "subject": "French"}
+  ],
+  "Tuesday": [
+    {"time": "8:00 am - 9:30 am", "subject": "Mathematics"},
+    {"time": "9:45 am - 11:15 am", "subject": "French"},
+    {"time": "11:30 am - 1:00 pm", "subject": "Biology"},
+    {"time": "2:00 pm - 3:30 pm", "subject": "History"}
+  ],
+  "Wednesday": [
+    {"time": "8:00 am - 9:30 am", "subject": "History"},
+    {"time": "9:45 am - 11:15 am", "subject": "Biology"},
+    {"time": "11:30 am - 1:00 pm", "subject": "French"},
+    {"time": "2:00 pm - 3:30 pm", "subject": "Mathematics"}
+  ],
+  "Thursday": [
+    {"time": "8:00 am - 9:30 am", "subject": "French"},
+    {"time": "9:45 am - 11:15 am", "subject": "History"},
+    {"time": "11:30 am - 1:00 pm", "subject": "Mathematics"},
+    {"time": "2:00 pm - 3:30 pm", "subject": "Biology"}
+  ],
+  "Friday": [
+    {"time": "8:00 am - 9:30 am", "subject": "Biology"},
+    {"time": "9:45 am - 11:15 am", "subject": "Mathematics"},
+    {"time": "11:30 am - 1:00 pm", "subject": "French"},
+    {"time": "2:00 pm - 3:30 pm", "subject": "History"}
+  ]
+}
