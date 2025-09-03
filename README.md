@@ -16,7 +16,7 @@ A terminal-style new tab page with a schedule-aware school menu and to-do list.
 
 1. Clone this repository:
 ```bash
-git clone https://github.com/yourusername/tui-homepage.git
+git clone https://github.com/jkru006/tui-homepage.git
 ```
 
 2. Install dependencies:
