@@ -12,7 +12,7 @@ TUI Homepage follows [Semantic Versioning](https://semver.org/) (SemVer):
 
 ## Current Version
 
-The current version is stored in `package.json` and is reflected in Git tags.
+The current version is stored in `package.json` and is reflected in Git tags. A version badge is displayed in the README.md file that automatically shows the latest release version from GitHub.
 
 ## How to Update the Version
 

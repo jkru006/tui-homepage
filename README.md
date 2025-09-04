@@ -1,5 +1,7 @@
 # TUI Homepage
 
+[![Version](https://img.shields.io/github/v/tag/jkru006/tui-homepage?label=version&color=blue)](https://github.com/jkru006/tui-homepage/releases)
+
 A terminal-style new tab page with a schedule-aware school menu and to-do list. Designed as a productivity dashboard for students.
 
 ## Features
