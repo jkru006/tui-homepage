@@ -16,9 +16,36 @@ The current version is stored in `package.json` and is reflected in Git tags. A 
 
 ## How to Update the Version
 
-### Using the Version Script
+### Automatic Updates with Git Hooks (Recommended)
 
-The easiest way to update the version is to use the included version script:
+The version is automatically updated with each commit using Git hooks:
+
+1. **Normal commits** increment the PATCH version (e.g., 1.0.0 → 1.0.1)
+2. **Minor version bumps** are triggered by including "[minor]" in your commit message (e.g., 1.0.1 → 1.1.0)
+3. **Major version bumps** are triggered by including "[major]" in your commit message (e.g., 1.1.0 → 2.0.0)
+
+Example commit commands:
+```bash
+# For patch update (1.0.0 → 1.0.1)
+git commit -m "Fixed a bug in the schedule display"
+
+# For minor update (1.0.1 → 1.1.0)
+git commit -m "[minor] Added dark mode support"
+
+# For major update (1.1.0 → 2.0.0)
+git commit -m "[major] Complete UI redesign with new features"
+```
+
+Git tags are automatically created for each version update by the post-commit hook.
+
+To push these tags to GitHub:
+```bash
+git push origin --tags
+```
+
+### Using the Version Script Manually
+
+You can also manually update the version using the included version script:
 
 ```bash
 # For a patch update (1.0.0 -> 1.0.1)

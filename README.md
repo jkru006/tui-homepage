@@ -365,3 +365,34 @@ Detailed implementation documentation is available for various components:
 - [To-Do List](docs/to-do-list.md) - Task management system
 - [Canvas Integration](docs/canvas-integration.md) - Canvas LMS API integration details
 - [Background Animation](docs/backgrounds.md) - WebGL-powered background system
+
+## Versioning
+
+This project uses [Semantic Versioning](https://semver.org/) (MAJOR.MINOR.PATCH).
+
+### Automatic Version Updates
+
+The project automatically updates its version number with each commit using Git hooks:
+
+1. **Normal commits** increment the PATCH version (e.g., 1.0.0 → 1.0.1)
+2. **Minor version bumps** are triggered by including "[minor]" in your commit message (e.g., 1.0.1 → 1.1.0)
+3. **Major version bumps** are triggered by including "[major]" in your commit message (e.g., 1.1.0 → 2.0.0)
+
+Example commit commands:
+```bash
+# For patch update (1.0.0 → 1.0.1)
+git commit -m "Fixed a bug in the schedule display"
+
+# For minor update (1.0.1 → 1.1.0)
+git commit -m "[minor] Added dark mode support"
+
+# For major update (1.1.0 → 2.0.0)
+git commit -m "[major] Complete UI redesign with new features"
+```
+
+Git tags are automatically created for each version update. To push these tags to GitHub:
+```bash
+git push origin --tags
+```
+
+For more details about the versioning system, see [VERSION.md](VERSION.md).
