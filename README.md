@@ -1,6 +1,6 @@
 # TUI Homepage
 
-[![Version](https://img.shields.io/github/v/tag/jkru006/tui-homepage?label=version&color=blue)](https://github.com/jkru006/tui-homepage/releases)
+[![Version](https://img.shields.io/github/v/tag/jkru006/tui-homepage?label=version&color=blue&cache_seconds=3600)](https://github.com/jkru006/tui-homepage/tags)
 
 A terminal-style new tab page with a schedule-aware school menu and to-do list. Designed as a productivity dashboard for students.
 
@@ -16,15 +16,10 @@ A terminal-style new tab page with a schedule-aware school menu and to-do list. 
 - To-do list for managing tasks
 - Status bar with context-aware URL previews
 - Animated terminal-style background
-- Class-specific resource integration (Zoom links, LMS access)
 
-## Setup Guide
-
-This guide will walk you through setting up the TUI Homepage from scratch, including installing all prerequisites.
+## Setup Guide (Linux)
 
 ### Prerequisites Installation
-
-#### For Linux (Ubuntu/Debian)
 
 1. Update your package lists:
    ```bash
@@ -43,47 +38,6 @@ This guide will walk you through setting up the TUI Homepage from scratch, inclu
 
 4. Verify installations:
    ```bash
-   git --version
-   node --version
-   npm --version
-   ```
-
-#### For macOS
-
-1. Install Homebrew (if not already installed):
-   ```bash
-   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-   ```
-
-2. Install Git:
-   ```bash
-   brew install git
-   ```
-
-3. Install Node.js and npm:
-   ```bash
-   brew install node
-   ```
-
-4. Verify installations:
-   ```bash
-   git --version
-   node --version
-   npm --version
-   ```
-
-#### For Windows
-
-1. Download and install Git from [git-scm.com](https://git-scm.com/download/win)
-   - During installation, select "Use Git from the Windows Command Prompt"
-   - Other options can remain at their defaults
-
-2. Download and install Node.js from [nodejs.org](https://nodejs.org/)
-   - Download the LTS version recommended for most users
-   - The installer will also install npm
-
-3. Verify installations (open Command Prompt):
-   ```cmd
    git --version
    node --version
    npm --version
@@ -108,22 +62,10 @@ This guide will walk you through setting up the TUI Homepage from scratch, inclu
 
 4. Create a `.env` file with your Canvas API token (if using Canvas features):
    ```bash
-   # Linux/macOS
    echo "CANVAS_TOKEN=your_token_here" > .env
-   
-   # Windows (Command Prompt)
-   echo CANVAS_TOKEN=your_token_here > .env
    ```
    
-   Replace `your_token_here` with your actual Canvas API token. 
-   
-   To get your Canvas token:
-   1. Log into Canvas
-   2. Go to Account > Settings
-   3. Scroll down to "Approved Integrations"
-   4. Click "New Access Token"
-   5. Give it a name and expiration date
-   6. Copy the token (you won't be able to see it again)
+   Replace `your_token_here` with your actual Canvas API token.
 
 5. Configure your class schedule in `public/config/schedule-config.json`:
    - Edit the file to match your personal class schedule
@@ -137,9 +79,7 @@ This guide will walk you through setting up the TUI Homepage from scratch, inclu
 
 7. Open http://localhost:3001 in your browser
 
-### Setting as Homepage or New Tab Page
-
-#### Firefox
+### Setting as New Tab Page in Firefox
 
 1. Open Firefox and go to Preferences/Options
 2. Under Home Page, enter: `http://localhost:3001`
@@ -147,25 +87,7 @@ This guide will walk you through setting up the TUI Homepage from scratch, inclu
    - Install the "New Tab Override" extension
    - Configure it to use `http://localhost:3001`
 
-#### Chrome
-
-1. Open Chrome and go to Settings
-2. Under "On startup", select "Open a specific page or set of pages"
-3. Add `http://localhost:3001`
-4. To set as New Tab page:
-   - Install the "New Tab Redirect" extension
-   - Configure it to use `http://localhost:3001`
-
-#### Edge
-
-1. Open Edge and go to Settings
-2. Under "Start, home, and new tabs"
-3. Set your homepage to `http://localhost:3001`
-4. For new tabs, install the "Custom New Tab URL" extension
-
 ### Running as a Service (Auto-start)
-
-#### Linux (systemd)
 
 1. Create a service file:
    ```bash
@@ -194,52 +116,19 @@ This guide will walk you through setting up the TUI Homepage from scratch, inclu
    sudo systemctl start tui-homepage
    ```
 
-#### macOS (launchd)
+# What's New in Version 1.2.0
 
-1. Create a launch agent file:
-   ```bash
-   nano ~/Library/LaunchAgents/com.user.tui-homepage.plist
-   ```
+## New Features
+- Added a "What's New" section to the README to track version changes
+- Restored scrolling animation for long assignment names in the schedule window
+- Fixed positioning issues with the main menu when switching between split-screen and full-screen modes
+- Improved style management for proper cleanup when exiting menus
 
-2. Add the following content (update paths as needed):
-   ```xml
-   <?xml version="1.0" encoding="UTF-8"?>
-   <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-   <plist version="1.0">
-   <dict>
-     <key>Label</key>
-     <string>com.user.tui-homepage</string>
-     <key>ProgramArguments</key>
-     <array>
-       <string>/usr/local/bin/node</string>
-       <string>/path/to/tui-homepage/server.js</string>
-     </array>
-     <key>RunAtLoad</key>
-     <true/>
-     <key>KeepAlive</key>
-     <true/>
-     <key>WorkingDirectory</key>
-     <string>/path/to/tui-homepage</string>
-   </dict>
-   </plist>
-   ```
-
-3. Load the agent:
-   ```bash
-   launchctl load ~/Library/LaunchAgents/com.user.tui-homepage.plist
-   ```
-
-#### Windows (Task Scheduler)
-
-1. Open Task Scheduler
-2. Click "Create Basic Task"
-3. Name it "TUI Homepage" and click Next
-4. Trigger: "When the computer starts" and click Next
-5. Action: "Start a program" and click Next
-6. Program/script: Path to Node.js executable (usually `C:\Program Files\nodejs\node.exe`)
-7. Arguments: Path to server.js (e.g., `C:\path\to\tui-homepage\server.js`)
-8. Start in: Path to project folder (e.g., `C:\path\to\tui-homepage`)
-9. Click Next and Finish
+## Technical Improvements
+- Fixed scrolling text implementation using CSS animations instead of JavaScript
+- Improved assignment name display with proper overflow handling
+- Text that doesn't fit container now automatically animates for better readability
+- Enhanced UI stability when switching between different views
 
 ### Troubleshooting
 
@@ -269,130 +158,7 @@ tui-homepage/
 │   └── backgrounds/         # Background animations
 ├── backgrounds/             # Background source code
 │   └── endportal-bg.js      # Terminal background animation
-├── docs/                    # Documentation
-│   ├── backgrounds.md       # Background animation system documentation
-│   ├── canvas-integration.md # Canvas LMS integration documentation
-│   ├── schedule-window.md   # Schedule sidebar implementation details
-│   ├── school-window.md     # School menu implementation details
-│   ├── search-window.md     # Search window implementation details
-│   └── to-do-list.md       # To-Do list implementation details
 ├── server.js                # Node.js server for Canvas API proxy
 ├── canvas-proxy.js          # Canvas API proxy implementation
 └── README.md                # Project documentation
 ```
-
-## Usage
-
-### Navigation
-- Use arrow keys (↑/↓) to navigate through menu items
-- Press Enter to select/open the highlighted option
-- Press Escape to return to the previous menu
-- Start typing to instantly open the search window
-- Status bar always shows the current URL or context
-
-### Main Menu
-- Quick access to common websites and tools
-- Select "Search" to open the multi-engine search window
-- Select "School" to access class-specific resources
-
-### School Menu
-- Automatically highlights your current or next class based on schedule
-- Displays all class links with proper icons and styling
-- Shows a schedule sidebar with today's timetable
-- When school day is over, highlights the last period of the day
-- Displays upcoming coursework for the selected class
-- "To-Do List" option for managing assignments
-
-### Search Window
-- Multiple search engine support (Google, DuckDuckGo, YouTube, etc.)
-- Real-time URL preview in status bar
-- Keyboard navigation between engines
-- Instant search initiation
-
-## Customization
-
-### Adding New Menu Items
-
-1. To add items to the main menu, edit `public/scripts/tui-start.js`:
-   - Find the `menuItems` array
-   - Add a new object with `label`, `url`, and `icon` properties
-
-2. To add items to the school menu, edit `public/scripts/school-window.js`:
-   - Find the `subjects` array
-   - Add a new object with `label`, `url`, and `icon` properties
-
-### Changing the Background
-
-1. The animated background is controlled by `backgrounds/endportal-bg.js`
-2. You can customize colors, animation speed, and density in this file
-3. To use a completely different background:
-   - Create a new background script in the `backgrounds` directory
-   - Update the reference in `public/index.html`
-
-### Styling Modifications
-
-1. Main styling is defined in `public/css/tui-start.css`
-2. Key elements you can customize:
-   - Color scheme (background, text, highlight colors)
-   - Box dimensions and borders
-   - Font family and sizes
-   - Animation effects
-   - Status bar appearance
-
-### Schedule Configuration
-
-1. Edit `public/config/schedule-config.json` to match your personal schedule
-2. Format:
-   ```json
-   {
-     "Monday": [
-       { "time": "9:00-10:30am", "subject": "Mathematics" },
-       { "time": "10:45-12:15pm", "subject": "History" }
-     ],
-     "Tuesday": [
-       ...
-     ]
-   }
-   ```
-
-## Documentation
-
-Detailed implementation documentation is available for various components:
-
-- [School Window](docs/school-window.md) - Implementation of the School Menu interface
-- [Schedule Window](docs/schedule-window.md) - Schedule sidebar and class tracking
-- [Search Window](docs/search-window.md) - Multi-engine search interface
-- [To-Do List](docs/to-do-list.md) - Task management system
-- [Canvas Integration](docs/canvas-integration.md) - Canvas LMS API integration details
-- [Background Animation](docs/backgrounds.md) - WebGL-powered background system
-
-## Versioning
-
-This project uses [Semantic Versioning](https://semver.org/) (MAJOR.MINOR.PATCH).
-
-### Automatic Version Updates
-
-The project automatically updates its version number with each commit using Git hooks:
-
-1. **Normal commits** increment the PATCH version (e.g., 1.0.0 → 1.0.1)
-2. **Minor version bumps** are triggered by including "[minor]" in your commit message (e.g., 1.0.1 → 1.1.0)
-3. **Major version bumps** are triggered by including "[major]" in your commit message (e.g., 1.1.0 → 2.0.0)
-
-Example commit commands:
-```bash
-# For patch update (1.0.0 → 1.0.1)
-git commit -m "Fixed a bug in the schedule display"
-
-# For minor update (1.0.1 → 1.1.0)
-git commit -m "[minor] Added dark mode support"
-
-# For major update (1.1.0 → 2.0.0)
-git commit -m "[major] Complete UI redesign with new features"
-```
-
-Git tags are automatically created for each version update. To push these tags to GitHub:
-```bash
-git push origin --tags
-```
-
-For more details about the versioning system, see [VERSION.md](VERSION.md).

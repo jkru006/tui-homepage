@@ -82,6 +82,10 @@ function openSchoolWindow() {
 		if (!schedule) return -1;
 		const nowMinutes = now.getHours() * 60 + now.getMinutes();
 		let lastIdx = -1;
+		let firstClassIdx = -1;
+		let firstClassStart = Infinity;
+		
+		console.log("[School Window] Getting current class. Current time in minutes:", nowMinutes, "Hour:", now.getHours());
 		
 		for (let i = 0; i < schedule.length; i++) {
 			const [start, end] = schedule[i].time.split('-');
@@ -95,10 +99,40 @@ function openSchoolWindow() {
 			}
 			const startM = parseTime(start);
 			const endM = parseTime(end);
-			if (nowMinutes >= startM && nowMinutes < endM) return i;
-			if (nowMinutes >= startM) lastIdx = i;
+			
+			// Track the first class of the day (skip lunch periods)
+			if (startM < firstClassStart && !schedule[i].subject.toLowerCase().includes('lunch')) {
+				firstClassStart = startM;
+				firstClassIdx = i;
+				console.log("[School Window] Found first class of day:", schedule[i].subject, "at index", i, "starting at", startM);
+			}
+			
+			// Check if we're currently in this class's time period
+			if (nowMinutes >= startM && nowMinutes < endM) {
+				console.log("[School Window] Currently in class period:", schedule[i].subject);
+				return i;
+			}
+			
+			if (nowMinutes >= startM) {
+				lastIdx = i;
+			}
 		}
+		
+		// Early morning hours (before 7 AM) or before first class or late night (after 8 PM), select first class
+		const earlyMorningHours = now.getHours() < 7;
+		const beforeFirstClass = firstClassIdx !== -1 && nowMinutes < firstClassStart;
+		const lateNightHours = now.getHours() >= 20; // After 8 PM
+		
+		if (earlyMorningHours || beforeFirstClass || lateNightHours) {
+			if (firstClassIdx !== -1) {
+				console.log("[School Window] Before school hours or late night, selecting first class of day at index:", firstClassIdx, 
+					"which is", schedule[firstClassIdx].subject);
+				return firstClassIdx;
+			}
+		}
+		
 		// If classes are over, select last period
+		console.log("[School Window] After school hours, selecting last period at index:", lastIdx);
 		return lastIdx;
 	}
 
@@ -111,6 +145,42 @@ function openSchoolWindow() {
 		tuiBox.classList.add('school-window');
 		tuiBox.style.width = '';
 		tuiBox.style.height = '';
+		
+		// Check if we're in fullscreen mode or split-screen mode
+		const windowWidth = window.innerWidth;
+		const tuiBoxWidth = 520; // Known width of the TUI box
+		const scheduleBoxWidth = 270; // Known width of schedule box
+		const gap = 12; // Gap between the two windows
+		const totalWidth = tuiBoxWidth + scheduleBoxWidth + gap;
+		const isFullScreen = windowWidth > 1200; // Threshold for "full screen"
+		
+		// In fullscreen mode, don't modify position - let the menu be centered normally
+		// In split-screen mode, position the window for centering both elements
+		if (!isFullScreen) {
+			const leftPosition = Math.max(0, (windowWidth - totalWidth) / 2);
+			
+			tuiBox.style.position = 'fixed'; // Changed to fixed for more reliable positioning
+			tuiBox.style.left = `${leftPosition}px`;
+			tuiBox.style.margin = '0';
+			tuiBox.style.zIndex = '9997'; // Lower than schedule window
+			tuiBox.style.transition = 'left 0.2s ease-out, top 0.2s ease-out'; // Smooth transitions
+			tuiBox.style.transform = 'translateZ(0)'; // Create stacking context
+			
+			// Vertically center
+			const windowHeight = window.innerHeight;
+			const boxHeight = tuiBox.clientHeight || 400;
+			tuiBox.style.top = `${Math.max(10, (windowHeight - boxHeight) / 2)}px`;
+			
+			console.log("[School Window] Split-screen mode, centering both windows. Left:", leftPosition);
+		} else {
+			console.log("[School Window] Fullscreen mode, keeping default centered position");
+			tuiBox.style.position = '';
+			tuiBox.style.left = '';
+			tuiBox.style.margin = '';
+			tuiBox.style.zIndex = '';
+			tuiBox.style.transform = '';
+			tuiBox.style.top = '';
+		}
 		
 		let html = `
 			<div style="position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0;height:100%;min-height:100%;">
@@ -167,19 +237,27 @@ function openSchoolWindow() {
 						'life skills': 'history',
 						'business math': 'math',
 						'us history': 'history',
+						'united states history': 'history',
 						'to-do list': 'to-do list',
 						'todo': 'to-do list',
 						'to do': 'to-do list',
 						'search': 'search',
 						'music': 'music',
 						'french': 'french',
+						'french 2': 'french',
 						'french 2 semester 2': 'french',
 						'united states history semester 2': 'history',
 						'homework cafe': 'to-do list',
 						'wellbeing: music': 'music',
 						'biology': 'biology',
 						'dashboard': 'dashboard',
-						'canvas': 'canvas'
+						'canvas': 'canvas',
+						// Add expanded mappings for subjects
+						'mathematics': 'math',
+						'business mathematics': 'math',
+						'cafe': 'to-do list',
+						'study': 'to-do list',
+						'study hall': 'to-do list'
 					};
 					
 					let searchLabel = label.trim().toLowerCase();
@@ -222,6 +300,7 @@ function openSchoolWindow() {
 				if (i === idx) {
 					const label = item.querySelector('.school-label')?.textContent?.trim();
 					window.selectedClassName = label;
+					// Dispatch event to notify schedule window about selection change
 					window.dispatchEvent(new CustomEvent('tuiSelectedClassChanged', { detail: { className: label } }));
 				}
 			});
@@ -294,10 +373,16 @@ function openSchoolWindow() {
 					document.querySelectorAll('.schedule-box').forEach(box => box.remove());
 					
 					// Clean up school window before opening to-do
+					// Clean up any custom positioning styles
+					const styleEl = document.getElementById('screen-mode-styles');
+					if (styleEl) {
+						styleEl.remove();
+						console.log('[School Window] Removed custom positioning styles before To-Do');
+					}
+					
 					tuiBox.innerHTML = originalHTML;
 					tuiBox.classList.remove('school-window');
-					tuiBox.style.width = '';
-					tuiBox.style.height = '';
+					tuiBox.style = ''; // Reset all styles at once
 					
 					// Remove the handler first to prevent any race conditions
 					document.removeEventListener('keydown', handleKey);
@@ -327,18 +412,34 @@ function openSchoolWindow() {
 			} else if (e.key === 'Escape') {
 				console.log("[School Window] Escape pressed");
 				// Clean up schedule box and any related elements
-				document.querySelectorAll('.schedule-box').forEach(box => box.remove());
+				// Clean up any existing schedule boxes
+				document.querySelectorAll('.schedule-box, .schedule-tui-box').forEach(box => box.remove());
 				const scheduleBox = document.getElementById('schedule-box');
 				if (scheduleBox) scheduleBox.remove();
+				console.log('[School Window] Cleaned up schedule boxes');
 				
 				// Clean up any dynamically added scripts
 				const todoScript = document.querySelector('script[src="/scripts/to-do.js"]');
 				if (todoScript) todoScript.remove();
 				
+				// Clean up any resize handlers
+				if (window._scheduleResizeHandler) {
+					window.removeEventListener('resize', window._scheduleResizeHandler);
+					window._scheduleResizeHandler = null;
+					console.log('[School Window] Removed resize handler');
+				}
+				
+				// Clean up any custom positioning styles
+				const styleEl = document.getElementById('screen-mode-styles');
+				if (styleEl) {
+					styleEl.remove();
+					console.log('[School Window] Removed custom positioning styles');
+				}
+				
 				tuiBox.innerHTML = originalHTML;
 				tuiBox.classList.remove('school-window');
-				tuiBox.style.width = '';
-				tuiBox.style.height = '';
+				tuiBox.style = ''; // Reset all styles at once
+				console.log('[School Window] Reset all styles on main menu');
 				document.removeEventListener('keydown', handleKey);
 				if (typeof tuiMenuInit === 'function') tuiMenuInit();
 			}
@@ -354,28 +455,34 @@ function openSchoolWindow() {
 
 	// Show schedule box
 	try {
-		if (typeof window.showScheduleBox === 'function') {
-			console.log("[School Window] Using existing showScheduleBox");
-			window.showScheduleBox();
-		} else {
-			// Load the schedule-window.js script first
-			console.log("[School Window] Loading schedule-window.js");
-			const script = document.createElement('script');
-			script.src = '/scripts/schedule-window.js';
-			script.onload = function() {
-				console.log("[School Window] schedule-window.js loaded");
-				if (typeof window.showScheduleBox === 'function') {
-					console.log("[School Window] Calling showScheduleBox");
-					window.showScheduleBox();
-				} else {
-					console.error('[School Window] showScheduleBox function not found after loading script');
-				}
-			};
-			script.onerror = function(e) {
-				console.error('[School Window] Error loading schedule-window.js:', e);
-			};
-			document.body.appendChild(script);
+		// Force reload of schedule-window.js to ensure we get a fresh copy
+		console.log("[School Window] Ensuring schedule-window.js is loaded");
+		
+		// Remove any existing schedule script first to force a clean reload
+		const existingScript = document.querySelector('script[src="/scripts/schedule-window.js"]');
+		if (existingScript) {
+			console.log("[School Window] Removing existing schedule script for clean reload");
+			existingScript.remove();
 		}
+		
+		// Now load the script fresh
+		const script = document.createElement('script');
+		script.src = '/scripts/schedule-window.js';
+		script.onload = function() {
+			console.log("[School Window] schedule-window.js loaded successfully");
+			if (typeof window.showScheduleBox === 'function') {
+				console.log("[School Window] Calling showScheduleBox");
+				setTimeout(() => {
+					window.showScheduleBox();
+				}, 100); // Short delay to ensure DOM is ready
+			} else {
+				console.error('[School Window] showScheduleBox function not found after loading script');
+			}
+		};
+		script.onerror = function(e) {
+			console.error('[School Window] Error loading schedule-window.js:', e);
+		};
+		document.body.appendChild(script);
 	} catch (e) {
 		console.error('[School Window] Error in schedule box initialization:', e);
 	}

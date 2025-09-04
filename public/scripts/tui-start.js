@@ -92,21 +92,47 @@ function tuiMenuInit() {
 				return;
 			}
 			if (label === 'School') {
-				// First ensure schedule-window.js is loaded
-				var scheduleScript = document.createElement('script');
-				scheduleScript.src = 'scripts/schedule-window.js';
-				scheduleScript.onload = function() {
-					// After schedule script is loaded, load and initialize school window
-					var schoolScript = document.createElement('script');
-					schoolScript.src = 'scripts/school-window.js';
-					schoolScript.onload = function() {
-						if (typeof openSchoolWindow === 'function') {
-							openSchoolWindow();
-						}
+				// Load both scripts in the correct order with proper error handling
+				console.log("[TUI Start] Preparing to open School window");
+				
+				// Load assignment-data.js first
+				var assignmentScript = document.createElement('script');
+				assignmentScript.src = 'scripts/assignment-data.js';
+				assignmentScript.onload = function() {
+					console.log("[TUI Start] Assignment data loaded");
+					
+					// Then load schedule-window.js
+					var scheduleScript = document.createElement('script');
+					scheduleScript.src = 'scripts/schedule-window.js';
+					scheduleScript.onload = function() {
+						console.log("[TUI Start] Schedule window script loaded");
+						
+						// Finally load and initialize school window
+						var schoolScript = document.createElement('script');
+						schoolScript.src = 'scripts/school-window.js';
+						schoolScript.onload = function() {
+							console.log("[TUI Start] School window script loaded");
+							if (typeof openSchoolWindow === 'function') {
+								console.log("[TUI Start] Opening school window");
+								openSchoolWindow();
+							} else {
+								console.error("[TUI Start] openSchoolWindow function not found!");
+							}
+						};
+						schoolScript.onerror = function(e) {
+							console.error("[TUI Start] Failed to load school-window.js:", e);
+						};
+						document.body.appendChild(schoolScript);
 					};
-					document.body.appendChild(schoolScript);
+					scheduleScript.onerror = function(e) {
+						console.error("[TUI Start] Failed to load schedule-window.js:", e);
+					};
+					document.body.appendChild(scheduleScript);
 				};
-				document.body.appendChild(scheduleScript);
+				assignmentScript.onerror = function(e) {
+					console.error("[TUI Start] Failed to load assignment-data.js:", e);
+				};
+				document.body.appendChild(assignmentScript);
 				return;
 			}
 			if (url) window.location.href = url;

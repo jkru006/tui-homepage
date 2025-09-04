@@ -16,31 +16,35 @@ The current version is stored in `package.json` and is reflected in Git tags. A 
 
 ## How to Update the Version
 
-### Automatic Updates with Git Hooks (Recommended)
+### Using the Commit Script (Recommended)
 
-The version is automatically updated with each commit using Git hooks:
+The easiest way to update the version is to use the provided commit script:
 
-1. **Normal commits** increment the PATCH version (e.g., 1.0.0 → 1.0.1)
-2. **Minor version bumps** are triggered by including "[minor]" in your commit message (e.g., 1.0.1 → 1.1.0)
-3. **Major version bumps** are triggered by including "[major]" in your commit message (e.g., 1.1.0 → 2.0.0)
-
-Example commit commands:
 ```bash
-# For patch update (1.0.0 → 1.0.1)
-git commit -m "Fixed a bug in the schedule display"
-
-# For minor update (1.0.1 → 1.1.0)
-git commit -m "[minor] Added dark mode support"
-
-# For major update (1.1.0 → 2.0.0)
-git commit -m "[major] Complete UI redesign with new features"
+./commit.sh "Your commit message"
 ```
 
-Git tags are automatically created for each version update by the post-commit hook.
+This script automatically:
+1. Updates the version in package.json (patch by default)
+2. Creates a git commit with your message
+3. Creates a git tag for the new version
 
-To push these tags to GitHub:
+You can control the version bump type by including special tags in your commit message:
+
 ```bash
-git push origin --tags
+# For patch update (1.0.0 → 1.0.1)
+./commit.sh "Fixed a bug in the schedule display"
+
+# For minor update (1.0.1 → 1.1.0)
+./commit.sh "[minor] Added dark mode support"
+
+# For major update (1.1.0 → 2.0.0)
+./commit.sh "[major] Complete UI redesign with new features"
+```
+
+After committing with the script, you can push your changes and tags with:
+```bash
+git push origin main && git push origin --tags
 ```
 
 ### Using the Version Script Manually
@@ -74,6 +78,7 @@ If you prefer to update the version manually:
 ## Version History
 
 - v1.0.0 - Initial stable release
+- v1.0.1 - v1.0.9 - Bug fixes and minor improvements
 
 ## When to Update the Version
 

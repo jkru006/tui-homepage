@@ -10,6 +10,16 @@
     html, body {
       overflow: hidden !important;
     }
+    
+    /* Hide scrollbars globally */
+    #search-suggestions, .tui-menu {
+      scrollbar-width: none !important; /* Firefox */
+      -ms-overflow-style: none !important; /* IE and Edge */
+    }
+    
+    #search-suggestions::-webkit-scrollbar, .tui-menu::-webkit-scrollbar {
+      display: none !important; /* Chrome, Safari and Opera */
+    }
   </style>
 </head>
 <body>
@@ -38,8 +48,9 @@
   </div>
   <div id="status-bar"></div>
   <script src="/scripts/tui-start.js"></script>
-  <script src="/scripts/school-window.js"></script>
+  <script src="/scripts/assignment-data.js"></script>
   <script src="/scripts/schedule-window.js"></script>
+  <script src="/scripts/school-window.js"></script>
   <script src="/scripts/to-do.js"></script>
   <script src="/scripts/search-window.js"></script>
   <script src="/backgrounds/endportal-bg.js"></script>

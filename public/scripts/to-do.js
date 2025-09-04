@@ -27,87 +27,182 @@ function openToDoWindow() {
 	let currentTab = 0;
 	let currentItem = 0;
 
-	// Load Canvas assignments for School and Completed tabs
+	// Load assignments from upcomingAssignmentsByContext or fetch from Canvas API
 	(async function() {
 		try {
-			if (!window.fetchCanvasAssignments || !window.fetchCanvasCompleted) {
-				await new Promise((resolve, reject) => {
-					const script = document.createElement('script');
-					script.src = 'scripts/canvas-api.js';
-					script.onload = resolve;
-					script.onerror = reject;
-					document.body.appendChild(script);
+			// First try to use assignments from window.upcomingAssignmentsByContext
+			function getAllAssignments() {
+				// Initialize if doesn't exist
+				if (!window.upcomingAssignmentsByContext) {
+					window.upcomingAssignmentsByContext = {
+						'Biology': [
+							{ name: 'Lab Report - Cell Division', due: '2025-09-05' },
+							{ name: 'Chapter 3 Questions', due: '2025-09-07' }
+						],
+						'Math': [
+							{ name: 'Algebra Homework Set 2', due: '2025-09-04' },
+							{ name: 'Linear Functions Quiz', due: '2025-09-06' }
+						],
+						'History': [
+							{ name: 'World War II Essay', due: '2025-09-08' },
+							{ name: 'Chapter 5 Reading', due: '2025-09-03' }
+						],
+						'French': [
+							{ name: 'Conjugation Exercise', due: '2025-09-05' },
+							{ name: 'Oral Presentation Prep', due: '2025-09-09' }
+						],
+						'Music': [
+							{ name: 'Composition Analysis', due: '2025-09-10' },
+							{ name: 'Practice Log', due: '2025-09-07' }
+						]
+					};
+				}
+				
+				const allAssignments = [];
+				
+				// Collect all assignments from all classes
+				Object.keys(window.upcomingAssignmentsByContext).forEach(className => {
+					const classAssignments = window.upcomingAssignmentsByContext[className];
+					if (Array.isArray(classAssignments)) {
+						classAssignments.forEach(assignment => {
+							allAssignments.push({
+								name: assignment.name,
+								class: className,
+								due: assignment.due,
+								url: assignment.url || `https://fusion.instructure.com/courses/${className.toLowerCase()}/assignments/`
+							});
+						});
+					}
 				});
+				
+				// Sort by due date
+				allAssignments.sort((a, b) => {
+					const dateA = new Date(a.due);
+					const dateB = new Date(b.due);
+					return dateA - dateB;
+				});
+				
+				return allAssignments;
 			}
-			const [assignments, completed] = await Promise.all([
-				window.fetchCanvasAssignments(),
-				window.fetchCanvasCompleted()
-			]);
-			// Build a set of completed assignment IDs for filtering
-			const completedIds = new Set((completed || []).map(a => a.assignment && a.assignment.id));
-			// Map course_id to real course name from assignments and completed
-			const allCourses = {};
-			(assignments || []).forEach(a => {
-				if (a.assignment && a.assignment.course_id && a.assignment.course && a.assignment.course.name) {
-					allCourses[a.assignment.course_id] = a.assignment.course.name;
+			
+			// Use assignments from upcomingAssignmentsByContext
+			const todoItems = getAllAssignments();
+			
+			// Fallback to Canvas API if available and todoItems is empty
+			if (todoItems.length === 0 && (window.fetchCanvasAssignments || document.querySelector('script[src="scripts/canvas-api.js"]'))) {
+				if (!window.fetchCanvasAssignments) {
+					await new Promise((resolve, reject) => {
+						const script = document.createElement('script');
+						script.src = 'scripts/canvas-api.js';
+						script.onload = resolve;
+						script.onerror = reject;
+						document.body.appendChild(script);
+					});
 				}
-			});
-			(completed || []).forEach(a => {
-				if (a.assignment && a.assignment.course_id && a.course && a.course.name) {
-					allCourses[a.assignment.course_id] = a.course.name;
+				
+				const [assignments, completed] = await Promise.all([
+					window.fetchCanvasAssignments(),
+					window.fetchCanvasCompleted()
+				]);
+				
+				// Aliases for Canvas course names
+				const courseAliases = {
+					'Biology A (J. Kruger)': 'Biology',
+					'Biology B (J. Kruger)': 'Biology',
+					'Business Math B (J. Kruger)': 'Math',
+					'French 2 B (J. Kruger)': 'French',
+					'Life Skills (J. Kruger)': 'History',
+					'United States History A (J. Kruger)': 'History',
+					'United States History B (J. Kruger)': 'History',
+					'Wellbeing: Music (J. Kruger)': 'Music',
+				};
+				
+				// Map Canvas assignments to our format
+				const canvasItems = (assignments || [])
+					.filter(a => a.submissions && a.submissions.submitted === false)
+					.map(a => {
+						const aliasClass = courseAliases[a.context_name || ''] || (a.context_name || '');
+						let name = (a.plannable && (a.plannable.name || a.plannable.title)) || a.assignment?.name || a.assignment?.title || a.title || 'Untitled';
+						let due = (a.plannable && a.plannable.due_at) || a.assignment?.due_at || a.plannable_date || '';
+						due = due ? new Date(due).toLocaleString() : 'No due date';
+						let url = a.html_url || a.assignment?.html_url || '';
+						if (url && url.startsWith('/')) url = 'https://fusion.instructure.com' + url;
+						return {
+							name,
+							class: aliasClass,
+							due,
+							url,
+						};
+					});
+					
+				// Only use Canvas items if we have any
+				if (canvasItems.length > 0) {
+					todoItems.push(...canvasItems);
 				}
-			});
-			// Aliases
-			const courseAliases = {
-				'Biology A (J. Kruger)': 'Bio',
-				'Biology B (J. Kruger)': 'Bio',
-				'Business Math B (J. Kruger)': 'Math',
-				'French 2 B (J. Kruger)': 'French',
-				'Life Skills (J. Kruger)': 'Prep',
-				'United States History A (J. Kruger)': 'History',
-				'United States History B (J. Kruger)': 'History',
-				'Wellbeing: Music (J. Kruger)': 'Music',
-			};
-			// To-Do: only assignments not completed (submissions.submitted === false)
-			const todoItems = (assignments || [])
-				.filter(a => a.submissions && a.submissions.submitted === false)
-				.map(a => {
-					// Always use context_name for alias lookup
-					const aliasClass = courseAliases[a.context_name || ''] || (a.context_name || '');
-					let name = (a.plannable && (a.plannable.name || a.plannable.title)) || a.assignment?.name || a.assignment?.title || a.title || 'Untitled';
-					let due = (a.plannable && a.plannable.due_at) || a.assignment?.due_at || a.plannable_date || '';
-					due = due ? new Date(due).toLocaleString() : 'No due date';
-					let url = a.html_url || a.assignment?.html_url || '';
-					if (url && url.startsWith('/')) url = 'https://fusion.instructure.com' + url;
-					return {
-						name,
-						class: aliasClass,
-						due,
-						url,
-					};
-				});
+			}
+			
 			tabs[0].items = todoItems.length > 0 ? todoItems : [
-				{ name: 'No Canvas assignments found', class: '', due: '', url: '' }
+				{ name: 'No upcoming assignments found', class: '', due: '', url: '' }
 			];
-			// Completed: only assignments with submissions.submitted === true
-			const completedItems = (assignments || [])
-				.filter(a => a.submissions && a.submissions.submitted === true)
-				.concat((completed || []).filter(a => a.submissions && a.submissions.submitted === true))
-				.map(a => {
-					// Always use context_name for alias lookup
-					const aliasClass = courseAliases[a.context_name || ''] || (a.context_name || '');
-					let name = (a.plannable && (a.plannable.name || a.plannable.title)) || a.assignment?.name || a.assignment?.title || a.title || 'Untitled';
-					let due = (a.plannable && a.plannable.due_at) || a.assignment?.due_at || a.plannable_date || '';
-					due = due ? new Date(due).toLocaleString() : 'No due date';
-					let url = a.html_url || a.assignment?.html_url || '';
-					if (url && url.startsWith('/')) url = 'https://fusion.instructure.com' + url;
-					return {
-						name,
-						class: aliasClass,
-						due,
-						url,
-					};
-				});
+			// For completed assignments, use some from each class that are "due" in the past
+			const now = new Date();
+			const mockCompletedItems = [];
+			
+			// Get completed items from each class (up to 2 per class)
+			Object.keys(window.upcomingAssignmentsByContext).forEach(className => {
+				const classAssignments = window.upcomingAssignmentsByContext[className];
+				if (Array.isArray(classAssignments) && classAssignments.length > 0) {
+					// Add 1-2 "completed" assignments per class (mock data)
+					const pastDate1 = new Date(now);
+					pastDate1.setDate(pastDate1.getDate() - Math.floor(Math.random() * 10 + 1)); // 1-10 days ago
+					
+					const pastDate2 = new Date(now);
+					pastDate2.setDate(pastDate2.getDate() - Math.floor(Math.random() * 5 + 1)); // 1-5 days ago
+					
+					mockCompletedItems.push({
+						name: `Completed ${className} Assignment 1`,
+						class: className,
+						due: pastDate1.toLocaleDateString(),
+						url: `https://fusion.instructure.com/courses/${className.toLowerCase()}/assignments/completed1`
+					});
+					
+					if (Math.random() > 0.3) { // 70% chance to add a second completed assignment
+						mockCompletedItems.push({
+							name: `Completed ${className} Assignment 2`,
+							class: className,
+							due: pastDate2.toLocaleDateString(),
+							url: `https://fusion.instructure.com/courses/${className.toLowerCase()}/assignments/completed2`
+						});
+					}
+				}
+			});
+			
+			// Try to get Canvas completed assignments if available
+			const canvasCompletedItems = [];
+			if (completed && completed.length > 0) {
+				(assignments || [])
+					.filter(a => a.submissions && a.submissions.submitted === true)
+					.concat((completed || []).filter(a => a.submissions && a.submissions.submitted === true))
+					.forEach(a => {
+						// Always use context_name for alias lookup
+						const aliasClass = courseAliases[a.context_name || ''] || (a.context_name || '');
+						let name = (a.plannable && (a.plannable.name || a.plannable.title)) || a.assignment?.name || a.assignment?.title || a.title || 'Untitled';
+						let due = (a.plannable && a.plannable.due_at) || a.assignment?.due_at || a.plannable_date || '';
+						due = due ? new Date(due).toLocaleString() : 'No due date';
+						let url = a.html_url || a.assignment?.html_url || '';
+						if (url && url.startsWith('/')) url = 'https://fusion.instructure.com' + url;
+						canvasCompletedItems.push({
+							name,
+							class: aliasClass,
+							due,
+							url,
+						});
+					});
+			}
+			
+			// Use Canvas items if available, otherwise use mock data
+			const completedItems = canvasCompletedItems.length > 0 ? canvasCompletedItems : mockCompletedItems;
+			
 			tabs[1].items = completedItems.length > 0 ? completedItems : [
 				{ name: 'No completed assignments found', class: '', due: '', url: '' }
 			];

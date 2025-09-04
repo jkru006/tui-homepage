@@ -99,7 +99,7 @@ window.openSearchWindow = function(initialText) {
 						"/>
 					</div>
 				</form>
-				<ul id="search-suggestions" class="tui-menu" style="padding:0 !important; width:100%; min-width:0; max-width:100%; position:relative; background:#000; color:#fff; z-index:10; flex:1 1 auto; max-height:210px; overflow-y:auto; display:block; border:2px solid #fff; border-radius:0; align-self:center; margin-top:18px;"></ul>
+				<ul id="search-suggestions" class="tui-menu" style="padding:0 !important; width:100%; min-width:0; max-width:100%; position:relative; background:#000; color:#fff; z-index:10; flex:1 1 auto; max-height:210px; overflow-y:hidden; display:block; border:2px solid #fff; border-radius:0; align-self:center; margin-top:18px; scrollbar-width:none; -ms-overflow-style:none;"></ul>
 			</div>
 		</div>
 	`;
