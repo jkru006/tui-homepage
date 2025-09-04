@@ -35,16 +35,19 @@ npm start
 ```
 
 5. Open http://localhost:3001 in your browser
-
+   
 ## Structure
 
-- `/public` - Static files served to the browser
-  - `/css` - Stylesheets
-  - `/scripts` - JavaScript files
-  - `/icons` - SVG icons
-  - `/backgrounds` - Background animations
-- `server.js` - Node.js server for Canvas API proxy
-- `schedule-data.json` - Class schedule configuration
+```text
+tui-homepage/
+├── public/                  # Static files served to the browser
+│   ├── css/                 # Stylesheets
+│   ├── scripts/             # JavaScript files
+│   ├── icons/               # SVG icons
+│   └── backgrounds/         # Background animations
+├── server.js                # Node.js server for Canvas API proxy
+└── schedule-data.json       # Class schedule configuration
+```
 
 ## Usage
 
