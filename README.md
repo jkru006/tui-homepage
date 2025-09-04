@@ -151,13 +151,13 @@ tui-homepage/
 │   │   ├── search-window.js # Search interface
 │   │   ├── to-do.js         # Task management interface
 │   │   ├── canvas-api.js    # Canvas LMS integration helper
+│   │   ├── assignment-data.js # Assignment data management
 │   │   └── google-autocomplete.js # Search suggestions helper
 │   ├── icons/               # SVG icons for menu items
 │   ├── config/              # Configuration files
 │   │   └── schedule-config.json # Class schedule data
 │   └── backgrounds/         # Background animations
-├── backgrounds/             # Background source code
-│   └── endportal-bg.js      # Terminal background animation
+│       └── endportal-bg.js  # Terminal background animation
 ├── server.js                # Node.js server for Canvas API proxy
 ├── canvas-proxy.js          # Canvas API proxy implementation
 └── README.md                # Project documentation
