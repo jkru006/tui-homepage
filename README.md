@@ -4,6 +4,10 @@
 
 A terminal-style new tab page with a schedule-aware school menu and to-do list. Designed as a productivity dashboard for students.
 
+<img width="1874" height="890" alt="Screenshot 2025-09-04 at 10-36-04 New Tab" src="https://github.com/user-attachments/assets/a0620f86-0f5c-4c3c-b984-5fea6c6d6c65" />
+<img width="1874" height="890" alt="Screenshot 2025-09-04 at 10-36-26 New Tab" src="https://github.com/user-attachments/assets/c2dde90f-b7bf-41ef-a0ee-7dc0d4bbfd26" />
+
+
 ## Features
 
 - Terminal-like interface with consistent TUI styling across all menus
