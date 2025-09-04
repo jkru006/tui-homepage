@@ -37,19 +37,24 @@ async function showScheduleBox() {
   let todaySchedule = null;
   let upcomingAssignments = window.upcomingAssignments || [];
   try {
-    const scheduleResp = await fetch('/public/schedule-data.json');
-    console.log("[Schedule Box] Schedule data fetch status:", req.status);
-			if (req.status === 200) {
+    const scheduleResp = await fetch('/config/schedule-config.json');
+    console.log("[Schedule Box] Schedule data fetch status:", scheduleResp.status);
+    if (scheduleResp.ok) {
       const scheduleData = await scheduleResp.json();
       todaySchedule = scheduleData[dayName];
+    } else {
+      todaySchedule = null;
+      console.error("[Schedule Box] Failed to fetch schedule data", scheduleResp.status);
     }
   } catch (e) {
     todaySchedule = null;
+    console.error("[Schedule Box] Error fetching schedule data", e);
   }
   // Helper to get current class index
   function getCurrentClassIdx(schedule) {
     if (!schedule) return -1;
     const nowMinutes = now.getHours() * 60 + now.getMinutes();
+    let lastIdx = -1;
     for (let i = 0; i < schedule.length; i++) {
       const [start, end] = schedule[i].time.split('-');
       function parseTime(t) {
@@ -63,8 +68,10 @@ async function showScheduleBox() {
       const startM = parseTime(start);
       const endM = parseTime(end);
       if (nowMinutes >= startM && nowMinutes < endM) return i;
+      if (nowMinutes >= startM) lastIdx = i;
     }
-    return -1;
+    // If classes are over, return the last period
+    return lastIdx;
   }
   let scheduleBox = document.getElementById('schedule-box');
   if (!scheduleBox) {
@@ -114,7 +121,13 @@ async function showScheduleBox() {
   let timeStr = `${displayHour}:${minutes.toString().padStart(2, '0')} ${ampm}`;
   const mm = (now.getMonth() + 1).toString().padStart(2, '0');
   const dd = now.getDate().toString().padStart(2, '0');
-  let scheduleHtml = `<div style='display:flex;flex-direction:column;align-items:flex-start;min-width:120px;'><span style='display:inline-flex;align-items:center;'><img src='https://unpkg.com/feather-icons/dist/icons/calendar.svg' alt='Schedule' style='width:20px;height:20px;filter:invert(1);margin-right:6px;'/><span style='font-weight:bold;font-size:1.05rem;'>Schedule</span></span><span style='font-size:1rem;font-weight:normal;margin:2px 0 0 26px;'>${dayName} ${timeStr}</span></div>`;
+  let scheduleHtml = `<div style='display:flex;flex-direction:column;align-items:flex-start;min-width:120px;'>
+    <span style='display:inline-flex;align-items:center;'>
+      <img src='/icons/calendar.svg' alt='Schedule' style='width:20px;height:20px;filter:invert(1);margin-right:6px;'/>
+      <span style='font-weight:bold;font-size:1.05rem;'>Schedule</span>
+    </span>
+    <span style='font-size:1rem;font-weight:normal;margin:2px 0 0 26px;'>${dayName} ${timeStr}</span>
+  </div>`;
     if (todaySchedule && todaySchedule.length > 0) {
       // Helper to render a styled list (schedule or coursework)
       function renderList(items, selectedIdx, extraBottomPadding = false) {
@@ -149,15 +162,31 @@ async function showScheduleBox() {
       }
       let currentIdx = getCurrentClassIdx(todaySchedule);
       if (currentIdx === -1) {
-        currentIdx = todaySchedule.findIndex(item => item.subject.trim().toLowerCase() === 'biology');
+        // Try to find Biology as fallback, but don't force it if there's no Biology class today
+        const biologyIdx = todaySchedule.findIndex(item => item.subject.trim().toLowerCase() === 'biology');
+        if (biologyIdx !== -1) {
+          currentIdx = biologyIdx;
+        } else if (todaySchedule.length > 0) {
+          // If no Biology and no current class found, use the last non-lunch class
+          for (let i = todaySchedule.length - 1; i >= 0; i--) {
+            if (!todaySchedule[i].subject.toLowerCase().includes('lunch')) {
+              currentIdx = i;
+              break;
+            }
+          }
+        }
       }
       // Render schedule list with selection
       scheduleHtml += `<div id='schedule-list-container'>` + renderList(todaySchedule, currentIdx) + `</div>`;
       // Coursework section
-      scheduleHtml += `<div style='margin-top:24px;display:flex;flex-direction:column;align-items:flex-start;min-width:120px;'>` +
-        `<span style='display:inline-flex;align-items:center;'><img src='https://unpkg.com/feather-icons/dist/icons/book-open.svg' alt='Coursework' style='width:20px;height:20px;filter:invert(1);margin-right:6px;'/><span style='font-weight:bold;font-size:1.05rem;'>Coursework</span></span>` +
-        `<span style='font-size:1rem;font-weight:normal;margin:2px 0 0 26px;'>${monthName} <span style='color:#888;'>${mm}/${dd}</span></span>` +
-        `<div id='coursework-list-container'></div></div>`;
+      scheduleHtml += `<div style='margin-top:24px;display:flex;flex-direction:column;align-items:flex-start;min-width:120px;'>
+        <span style='display:inline-flex;align-items:center;'>
+          <img src='/icons/book-open.svg' alt='Coursework' style='width:20px;height:20px;filter:invert(1);margin-right:6px;'/>
+          <span style='font-weight:bold;font-size:1.05rem;'>Coursework</span>
+        </span>
+        <span style='font-size:1rem;font-weight:normal;margin:2px 0 0 26px;'>${monthName} <span style='color:#888;'>${mm}/${dd}</span></span>
+        <div id='coursework-list-container'></div>
+      </div>`;
 
             // Coursework always uses main TUI selection
       function updateCourseworkFromTuiSelection() {
@@ -192,8 +221,8 @@ async function showScheduleBox() {
         // Initial highlight
         updateSelection(selectedIdx);
         // Keyboard navigation for schedule list (only highlight)
-        scheduleBox.tabIndex = 0;
-        scheduleBox.focus();
+        scheduleBox.tabIndex = -1; // Prevent automatic focus
+        // Do NOT focus the schedule box by default
         scheduleBox.addEventListener('keydown', (e) => {
           if (e.key === 'ArrowDown') {
             selectedIdx = (selectedIdx + 1) % lis.length;

@@ -1,0 +1,43 @@
+{
+  "Sunday": [
+    { "time": "1:30-2:30pm", "subject": "Lunch" },
+    { "time": "2:30-3:30pm", "subject": "Music" },
+    { "time": "3:30-4:30pm", "subject": "French" },
+    { "time": "4:30-5:30pm", "subject": "US History" },
+    { "time": "5:30-10:30pm", "subject": "Music" }
+  ],
+  "Monday": [
+    { "time": "1:30-2:30pm", "subject": "Lunch" },
+    { "time": "2:30-3:30pm", "subject": "Music" },
+    { "time": "3:30-4:30pm", "subject": "French" },
+    { "time": "4:30-5:30pm", "subject": "US History" },
+    { "time": "5:30-6:30pm", "subject": "HC" }
+  ],
+  "Tuesday": [
+    { "time": "1:30-2:30pm", "subject": "Lunch" },
+    { "time": "2:30-3:30pm", "subject": "HC" },
+    { "time": "3:30-4:30pm", "subject": "HC" },
+    { "time": "4:30-5:30pm", "subject": "Business Math" },
+    { "time": "5:30-6:30pm", "subject": "Biology" }
+  ],
+  "Wednesday": [
+    { "time": "1:30-2:30pm", "subject": "Lunch" },
+    { "time": "2:30-3:30pm", "subject": "Music" },
+    { "time": "3:30-4:30pm", "subject": "French" },
+    { "time": "4:30-5:30pm", "subject": "US History" },
+    { "time": "5:30-6:30pm", "subject": "HC" }
+  ],
+  "Thursday": [
+    { "time": "1:30-2:30pm", "subject": "Lunch" },
+    { "time": "2:30-3:30pm", "subject": "HC" },
+    { "time": "3:30-4:30pm", "subject": "HC" },
+    { "time": "4:30-5:30pm", "subject": "Business Math" },
+    { "time": "5:30-6:30pm", "subject": "Biology" }
+  ],
+  "Friday": [
+    { "time": "1:30-2:30pm", "subject": "Lunch" },
+    { "time": "2:30-3:30pm", "subject": "Life Skills" },
+    { "time": "3:30-4:30pm", "subject": "Life Skills" },
+    { "time": "4:30-5:30pm", "subject": "Homework Cafe" }
+  ]
+}

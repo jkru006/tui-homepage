@@ -109,37 +109,26 @@ function openSchoolWindow() {
 		
 		// Create the school menu
 		tuiBox.classList.add('school-window');
-		tuiBox.style.width = '';
-		tuiBox.style.height = '';
+		tuiBox.style.width = '400px';
+		tuiBox.style.height = 'auto';
 		
-		let html = `
-			<div style="position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0;height:100%;min-height:100%;">
-				<div style="width:520px;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;">
-					<div style="position:relative;width:100%;height:0;">
-						<div style="position:absolute;top:0;left:0;width:18px;height:18px;border-left:3px solid #fff;border-top:3px solid #fff;"></div>
-						<span style="position:absolute;top:-13px;left:26px;font-size:1.1rem;font-weight:bold;letter-spacing:0.1em;color:#fff;white-space:nowrap;background:#000;padding:0 8px;z-index:2;">School Menu</span>
-						<div style="position:absolute;top:0;left:0;width:100%;height:0;border-top:2px solid #fff;z-index:1;"></div>
-					</div>
-					<div style="box-sizing:border-box;border-left:3px solid #fff;border-right:3px solid #fff;border-bottom:3px solid #fff;border-top:none;border-radius:0;padding:16px 48px 16px 48px;background:#000;width:520px;min-width:520px;max-width:520px;min-height:188px;display:flex;flex-direction:column;align-items:center;justify-content:center;margin-top:0;">
-						<div style="width:100%;text-align:center;color:#fff;font-size:1rem;margin-bottom:12px;">Use ↑ ↓ to navigate, Enter to open</div>
-						<ul class="tui-menu">
-		`;
+		let html = '<div class="tui-window" style="width: 100%; height: 100%; border: 2px solid #fff;">';
+		html += '<div class="tui-title">School Menu</div>';
+		html += '<div class="tui-content">';
 		
 		subjects.forEach(subject => {
-			html += `<li data-url="${subject.url}"><span class="icon-bracket"><img src="${subject.icon}" alt=""></span> <span class="menu-label"><span class="school-label">${subject.label}</span></span></li>`;
+			html += `<div class="tui-item" data-url="${subject.url}">`;
+			html += `<div class="icon-bracket"><img src="${subject.icon}" alt="" style="filter: invert(1);"></div>`;
+			html += `<span class="menu-label" style="color: #fff;"><span class="school-label">${subject.label}</span></span>`;
+			html += '</div>';
 		});
 		
-		html += `
-						</ul>
-					</div>
-				</div>
-			</div>
-		`;
+		html += '</div>';
+		html += '</div>';
 		
 		tuiBox.innerHTML = html;
 		
-		const menu = document.querySelector('.tui-menu');
-		const items = Array.from(menu.querySelectorAll('li'));
+		const items = document.querySelectorAll('.tui-item');
 		let current = 0; // Default to first item
 		
 		try {
@@ -215,22 +204,31 @@ function openSchoolWindow() {
 			console.log("[School Window] Updating active item:", idx);
 			const statusBar = document.getElementById('status-bar');
 			items.forEach((item, i) => {
-				// Toggle active class which handles all styling through CSS
-				item.classList.toggle('active', i === idx);
-				
-				// If this is the active item, emit the event for selection change
+				const icon = item.querySelector('.icon-bracket img');
 				if (i === idx) {
+					item.classList.add('active');
+					item.style.background = '#fff';
+					item.style.color = '#000';
+					item.querySelector('.menu-label').style.color = '#000';
+					if (icon) icon.style.filter = 'invert(0)';
+					// Emit event for selection change
 					const label = item.querySelector('.school-label')?.textContent?.trim();
 					window.selectedClassName = label;
 					window.dispatchEvent(new CustomEvent('tuiSelectedClassChanged', { detail: { className: label } }));
+				} else {
+					item.classList.remove('active');
+					item.style.background = 'none';
+					item.style.color = '#fff';
+					item.querySelector('.menu-label').style.color = '#fff';
+					if (icon) icon.style.filter = 'invert(1)';
+				}
+				// Ensure icon is always visible
+				if (icon) {
+					icon.style.display = 'inline';
+					icon.style.visibility = 'visible';
+					icon.style.opacity = '1';
 				}
 			});
-			
-			// Make active item scroll into view if needed
-			if (idx < items.length) {
-				items[idx].scrollIntoView({ block: 'nearest' });
-			}
-			
 			// Update status bar
 			if (statusBar && items[idx]) {
 				const label = items[idx].querySelector('.school-label')?.textContent?.trim();
@@ -243,19 +241,7 @@ function openSchoolWindow() {
 			}
 		}
 		
-		// Set up focus handling like the main menu
-		function ensureFocus() {
-			if (document.activeElement !== tuiBox) {
-				tuiBox.focus();
-			}
-		}
-		
-		tuiBox.setAttribute('tabindex', '0');
-		ensureFocus();
 		updateActive(current);
-		
-		// Add blur event to maintain focus
-		tuiBox.addEventListener('blur', ensureFocus);
 		
 		function handleKey(e) {
 			console.log("[School Window] Key pressed:", e.key);

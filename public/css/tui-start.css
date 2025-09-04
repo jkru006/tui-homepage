@@ -1,198 +1,257 @@
-/* Global Reset */
-html, body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    background: #000;
-    color: #fff;
-    font-family: monospace;
-    overflow: hidden;
+/* TUI icon button base style */
+.tui-icon-btn {
+  background: none;
+  color: #fff;
+  border: none;
+  border-radius: 0 !important;
+  position: relative;
+  min-height: 2ch;
+  font-size: 1.1rem;
+  transition: background 0.1s, color 0.1s;
+  outline: none;
+  box-shadow: none;
+}
+.tui-icon-btn .icon-btn-bracket img {
+  filter: invert(1) !important;
+  color: #fff;
+  width: 28px;
+  height: 28px;
+  display: block;
+  pointer-events: none;
+}
+.tui-icon-btn.active, .tui-icon-btn:focus, .tui-icon-btn:hover {
+  background: #fff !important;
+  color: #000 !important;
+  border: 2px solid #fff !important;
+  border-radius: 0 !important;
+  z-index: 2;
+}
+.tui-icon-btn.active .icon-btn-bracket img,
+.tui-icon-btn:focus .icon-btn-bracket img,
+.tui-icon-btn:hover .icon-btn-bracket img {
+  filter: invert(0) !important;
+  color: #000;
 }
 
+/* Icon row layout for To-Do List */
+.todo-icon-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-top: 18px;
+  gap: 32px;
+}
+/* moved to bottom for specificity */
+/* Force search window size to override all */
+/* removed duplicate, only at bottom for specificity */
+/* All TUI windows (main menu, search, school) use the same size and centering */
+/* Stronger specificity for TUI boxes */
+.tui-box,
+.tui-box.main-menu-window,
+.tui-box.search-window,
+.tui-box.school-window {
+  min-width: 587.8px !important;
+  min-height: 512.6px !important;
+  width: 587.8px !important;
+  height: 512.6px !important;
+  max-width: 587.8px !important;
+  max-height: 512.6px !important;
+  box-sizing: border-box !important;
+  background: #000 !important;
+  border: 2px solid #fff !important;
+  border-radius: 8px !important;
+  padding: 48px 64px 24px 64px !important;
+  box-shadow: 0 0 48px #000a !important;
+  outline: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
+}
+#menu-tooltip {
+  width: 100%;
+  max-width: 460px;
+  align-self: stretch;
+  text-align: center;
+  color: #fff;
+  font-size: 1rem;
+  margin: 12px 0 0 0;
+  box-sizing: border-box;
+}
 body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
+  background: #000;
+  color: #fff;
+  font-family: 'Fira Mono', 'SF Mono', 'Consolas', 'Nerd Font', monospace;
+  min-height: 100vh;
+  margin: 0;
+  position: relative;
+  width: 100vw;
+  height: 100vh;
 }
 
-/* Border corners */
-.corner {
-    position: absolute;
-    width: 18px;
-    height: 18px;
-    border-style: solid;
-    border-color: #fff;
-    z-index: 2;
+#pipes-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
 }
 
-.corner-tl {
-    top: 0;
-    left: 0;
-    border-width: 3px 0 0 3px;
+
+#ascii-title, #ascii-footer {
+  color: #fff;
+  margin: 0;
+  font-size: 1.1rem;
+  white-space: pre;
 }
 
-.corner-tr {
-    top: 0;
-    right: 0;
-    border-width: 3px 3px 0 0;
-}
-
-.corner-bl {
-    bottom: 0;
-    left: 0;
-    border-width: 0 0 3px 3px;
-}
-
-.corner-br {
-    bottom: 0;
-    right: 0;
-    border-width: 0 3px 3px 0;
-}
-
-#status-bar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 24px;
-    line-height: 24px;
-    color: #fff;
-    background: #000;
-    padding: 0 16px;
-    font-family: monospace;
-    font-size: 14px;
-    border-top: 2px solid #fff;
-    z-index: 1000;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    display: block !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-}
-
-.tui-box {
-    position: relative;
-    z-index: 1;
-    background: #000;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: fit-content;
-    margin: 0 auto;
-}
-
-.tui-box > div {
-    position: relative;
-    padding: 8px;
-}
-
-.tui-box:focus {
-    outline: none;
-}
-
-.tui-box:focus .tui-menu {
-    filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.3));
-}
-
-/* Fix box corners */
-.tui-box > div > div:first-child {
-    margin-bottom: 0;
-    height: 24px !important;
-}
-
-.icon-bracket {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px;
-    height: 24px;
-}
-
-.icon-bracket img {
-    width: 18px;
-    height: 18px;
-    filter: invert(1);
-    vertical-align: middle;
-    margin-right: 8px;
-    transition: filter 0.2s;
-}
-
+/* Stronger specificity for menu */
 .tui-menu {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    min-width: 200px;
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 32px auto !important;
+  width: 100% !important;
+  max-width: 460px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  font-size: 1.1rem !important;
 }
 
 .tui-menu li {
-    color: #fff;
-    padding: 8px 16px;
-    margin: 2px 0;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: all 0.2s ease;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
+  padding: 0 0 0 2ch;
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin: 6px 0;
+  height: 2ch;
+  line-height: 2ch;
+  font-size: 1.1rem;
+  background: none;
+  color: #fff;
+  border-left: none;
+  transition: background 0.1s, color 0.1s;
+  width: 100%;
+  max-width: 480px;
+  margin-left: 0;
+  margin-right: 0;
+  text-align: left;
+  justify-content: flex-start;
 }
 
-.tui-menu li:hover {
-    background: rgba(255, 255, 255, 0.1);
-}
-
+/* Stronger specificity for active menu item */
 .tui-menu li.active {
-    background: rgba(255, 255, 255, 0.9);
-    color: #000;
-    transform: scale(1.02);
+  background: #fff !important;
+  color: #000 !important;
+  border: 2px solid #fff !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+  z-index: 2 !important;
+  left: 0 !important;
+  right: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  width: 100% !important;
+  max-width: 480px !important;
+  text-align: left !important;
+  justify-content: flex-start !important;
 }
 
-.tui-menu li.active img,
-.tui-menu li:hover img {
-    filter: none;
+.tui-menu li.active .icon-bracket img {
+  filter: invert(0) !important;
+  color: #000;
 }
 
-.tui-menu li.active .menu-label {
-    color: #000;
-    font-weight: bold;
+.tui-menu li.active::before {
+  content: '[';
+  color: #000;
+  position: absolute;
+  left: 0.5ch;
+  font-weight: bold;
+}
+.tui-menu li.active::after {
+  content: ']';
+  color: #000;
+  position: absolute;
+  right: 0.5ch;
+  font-weight: bold;
 }
 
-.tui-menu li:hover .menu-label {
-    color: #fff;
+.icon-bracket {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.5em;
+}
+.icon-bracket img {
+  width: 1em;
+  height: 1em;
+  display: block;
+  filter: invert(1);
 }
 
-.menu-label {
-    color: #fff;
-    font-size: 16px;
-    font-family: monospace;
-    line-height: 1.4;
-    margin-left: 8px;
-    letter-spacing: 0.5px;
+.tui-menu .nf {
+  font-family: 'Nerd Font', 'Fira Mono', 'SF Mono', 'Consolas', monospace;
+  font-size: 1.2em;
+  margin-right: 1ch;
+  width: 1.5em;
+  display: inline-block;
+  text-align: center;
 }
 
-.school-icon {
-    width: 18px;
-    height: 18px;
-    vertical-align: middle;
-    margin-right: 8px;
+/* Stronger specificity for status bar */
+#status-bar {
+  position: fixed !important;
+  left: 0 !important;
+  bottom: 0 !important;
+  right: auto !important;
+  background: #111 !important;
+  color: #fff !important;
+  font-family: 'Fira Mono', 'SF Mono', 'Consolas', monospace !important;
+  font-size: 1rem !important;
+  padding: 6px 18px 6px 12px !important;
+  border-top-right-radius: 8px !important;
+  border: 2px solid #fff !important;
+  border-left: none !important;
+  border-bottom: none !important;
+  z-index: 3 !important;
+  min-width: 200px !important;
+  max-width: 60vw !important;
+  white-space: nowrap !important;
+  pointer-events: none !important;
+  opacity: 0.95 !important;
 }
 
-.school-list-item img.school-icon {
-    display: inline !important;
-    visibility: visible !important;
-    opacity: 1 !important;
+.border-label {
+  position: relative;
+  border: 2px solid #fff;
+  border-radius: 6px;
+  padding: 8px;
+  text-align: left;
+  margin-bottom: 16px;
 }
 
-/* Improved border styles */
-.tui-box > div > div:first-child {
-    position: relative;
-    margin-bottom: 16px;
+.border-label input {
+  border: none;
+  background: #000;
+  color: #fff;
 }
 
-/* Add glowing effect to active menu */
-.tui-box[tabindex="0"]:focus-within {
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+.border-label::before {
+  content: "Search";
+  position: absolute;
+  top: -0.7em;
+  left: 10px;
+  background: #000;
+  color: #fff;
+  padding: 0 6px;
+  font-weight: bold;
+  font-size: 1rem;
 }

@@ -16,9 +16,9 @@ if (typeof canvasProxy === 'function') {
   canvasProxy(app);
 }
 
-// Fallback: serve tui-start.html for any unknown route (for SPA-like behavior)
+// Fallback: serve index.html for any unknown route (for SPA-like behavior)
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'tui-start.html'));
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 app.listen(PORT, () => {

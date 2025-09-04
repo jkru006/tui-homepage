@@ -7,31 +7,31 @@ window.searchProviders = [
     {
         name: 'Google',
         displayName: 'Search Google',
-        icon: 'https://unpkg.com/feather-icons/dist/icons/search.svg',
+        icon: '/icons/search.svg',
         baseUrl: 'https://www.google.com/search?q='
     },
     {
         name: 'ChatGPT',
         displayName: 'Ask ChatGPT',
-        icon: 'https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/openai.svg',
+        icon: '/icons/openai.svg',
         baseUrl: 'https://chat.openai.com/'
     },
     {
         name: 'YouTube',
         displayName: 'Search YouTube',
-        icon: 'https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/youtube.svg',
+        icon: '/icons/youtube.svg',
         baseUrl: 'https://www.youtube.com/results?search_query='
     },
     {
         name: 'TikTok',
         displayName: 'Search TikTok',
-        icon: 'https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/tiktok.svg',
+        icon: '/icons/tiktok.svg',
         baseUrl: 'https://www.tiktok.com/search?q='
     },
     {
         name: 'Reddit',
         displayName: 'Search Reddit',
-        icon: 'https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/reddit.svg',
+        icon: '/icons/reddit.svg',
         baseUrl: 'https://www.reddit.com/search/?q='
     }
 ];
@@ -70,13 +70,13 @@ window.openSearchWindow = function(initialText) {
 			<div style="position:relative;width:100%;height:0;">
 				<div style="position:absolute;top:0;left:0;width:18px;height:18px;border-left:3px solid #fff;border-top:3px solid #fff;"></div>
 				<span style="position:absolute;top:-13px;left:26px;font-size:1.1rem;font-weight:bold;letter-spacing:0.1em;color:#fff;white-space:nowrap;background:#000;padding:0 8px;z-index:2;">Search</span>
-				<div style="position:absolute;top:0;left:0;width:100%;height:0;border-top:2px solid #fff;z-index:1;"></div>
+				<div style="position:absolute;top:0;left:0;width:100%;height:0;border-top:3px solid #fff;z-index:1;"></div>
 			</div>
 			<div style="box-sizing:border-box;border-left:3px solid #fff;border-right:3px solid #fff;border-bottom:3px solid #fff;border-top:none;border-radius:0;padding:24px 48px 24px 48px;background:#000;width:520px;min-width:520px;max-width:520px;min-height:188px;height:395.6px;display:flex;flex-direction:column;align-items:center;justify-content:center;margin-top:0;overflow:hidden;">
 				<form id="search-form" autocomplete="off" style="width:100%; display:flex; justify-content:center; align-items:center; margin-bottom:18px; margin-top:18px;" onsubmit="return false;">
 					<div style="width:100%;position:relative;">
 						<div style="position:absolute;left:10px;top:50%;transform:translateY(-50%);display:flex;align-items:center;pointer-events:none;z-index:2;">
-							<img id="search-provider-icon" width="14" height="14" style="filter:invert(1);" />
+							<img id="search-provider-icon" src="/icons/search.svg" width="14" height="14" style="filter:invert(1);opacity:1;visibility:visible;" />
 						</div>
 						<input id="search-input" type="text" autocomplete="off" autofocus style="
 							font-family:monospace;
@@ -136,6 +136,9 @@ window.openSearchWindow = function(initialText) {
         const providerIcon = document.getElementById('search-provider-icon');
         if (providerIcon) {
             providerIcon.src = window.searchProviders[window._currentProvider].icon;
+            providerIcon.style.display = 'inline-block';
+            providerIcon.style.visibility = 'visible';
+            providerIcon.style.opacity = '1';
         }
         
         // Show initial empty state with splash screen
@@ -259,7 +262,7 @@ window.openSearchWindow = function(initialText) {
 							←
 						</div>
 						<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0;">
-							<img src="${provider.icon}" width="40" height="40" style="margin-bottom:12px;filter:invert(1);" alt="${provider.name} icon">
+							<img src="${provider.icon}" width="40" height="40" style="margin-bottom:12px;filter:invert(1);opacity:1;visibility:visible;display:inline-block;" alt="${provider.name} icon">
 							<div style="font-family:'Fira Mono', 'SF Mono', 'Consolas', 'Nerd Font', monospace;font-size:1rem;color:#fff;font-weight:bold;letter-spacing:0.04em;white-space:nowrap;">${provider.displayName}</div>
 						</div>
 						<div class="provider-arrow" style="display:flex;justify-content:center;align-items:center;cursor:pointer;font-size:1.6rem;font-family:monospace;transition:transform 0.15s ease;color:#fff;" onclick="window._currentProvider = (window._currentProvider + 1) % ${searchProviders.length}; renderSuggestions(); updateCurrentUrl();">
@@ -323,6 +326,9 @@ window.openSearchWindow = function(initialText) {
 				const providerIcon = document.getElementById('search-provider-icon');
 				if (providerIcon) {
 					providerIcon.src = window.searchProviders[window._currentProvider].icon;
+					providerIcon.style.display = 'inline-block';
+					providerIcon.style.visibility = 'visible';
+					providerIcon.style.opacity = '1';
 				}
 				
 				// Update the URL and UI
